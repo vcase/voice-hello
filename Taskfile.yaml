@@ -1,0 +1,48 @@
+version: "3"
+
+silent: true
+
+includes:
+  hello-api: 
+    taskfile: ../task-library/taskfiles/api.yaml
+    vars:
+      repoUrl: 'git@github.com:vcase/voice-api.git'
+      version: hello-v0.0.1
+      package: hello
+      protofile: messages.proto
+
+tasks:
+  debug:
+    vars:
+      repoName: 
+        sh: bash -c '$TASK_SCRIPTS_DIR/git.sh getRepoName {{.repoUrl}} {{.version }}'
+      repoDir:  
+        sh: bash -c '$TASK_SCRIPTS_DIR/git.sh getRepoDir  {{.repoUrl}} {{.version }}' 
+      version:
+        sh: bash -c '$TASK_SCRIPTS_DIR/git.sh getVersion  {{.repoUrl}} {{.version }}' 
+      package: '{{ default "" .package }}'
+      protofile: '{{ default "" .protofile }}'
+    cmds:
+      - |
+        echo
+        echo "repoName '{{.repoName }}'"
+        echo "repoUrl '{{.repoUrl }}'"
+        echo "repoDir '{{.repoDir}}'"
+        echo "version '{{.version}}'"
+        echo "package '{{.package }}'"
+        echo "protofile '{{.protofile }}'"
+
+  build:
+    cmds:
+      - task: hello-api:gen-client
+
+  swagger:
+    cmds:
+      - task: swagger:gen-api-swagger-server
+        vars:
+          package: "{{.projectname}}"
+  db:
+    cmds:
+      - task: db:gen-db-client
+        vars:
+          package: "{{.projectname}}"
