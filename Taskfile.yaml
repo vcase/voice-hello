@@ -10,9 +10,24 @@ includes:
       version: hello-v0.0.1
       package: hello
       protofile: messages.proto
+  swagger: 
+    taskfile: ../task-library/taskfiles/swagger.yaml
 
 tasks:
-
+  all:
+    cmds:
+      - task: gen-grpc
+      - task: swagger
+      - task: build
+  gen-grpc:
+    cmds:
+      - task: hello-api:gen-server
+  swagger:
+    cmds:
+      - |
+        echo "PDIR {{.PROJECT_DIR}}"
+        echo "PGEN {{.PROJECT_GENERATED_PKG}}"
+      - task: swagger:gen-dist
   build:
     cmds:
-      - task: hello-api:gen-client
+      - go build ./...
