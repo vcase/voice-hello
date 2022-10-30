@@ -1,4 +1,4 @@
-module github.com/vcase/voice-hello
+module github.com/vcase/voice-servicetemplate
 
 go 1.18
 

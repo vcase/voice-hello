@@ -3,31 +3,43 @@ version: "3"
 silent: true
 
 includes:
-  hello-api: 
+  api: 
+    taskfile: ../task-library/taskfiles/api.yaml
+  api-binaryops: 
     taskfile: ../task-library/taskfiles/api.yaml
     vars:
       repoUrl: 'git@github.com:vcase/voice-api.git'
-      version: hello-v0.0.1
-      package: hello
-      protofile: messages.proto
+      version: binaryops-v0.0.1
+      package: service-template/binaryops
+  api-unaryops: 
+    taskfile: ../task-library/taskfiles/api.yaml
+    vars:
+      repoUrl: 'git@github.com:vcase/voice-api.git'
+      version: unaryops-v0.0.1
+      package: service-template/unaryops
   swagger: 
     taskfile: ../task-library/taskfiles/swagger.yaml
 
 tasks:
   all:
     cmds:
-      - task: gen-grpc
-      - task: swagger
+      - task: gen-grpc-binaryops
+      - task: gen-grpc-unaryops
+      - task: swagger-ui
+      - task: gen-run-server
       - task: build
-  gen-grpc:
+  gen-grpc-binaryops:
     cmds:
-      - task: hello-api:gen-server
-  swagger:
+      - task: api-binaryops:gen-server
+  gen-grpc-unaryops:
     cmds:
-      - |
-        echo "PDIR {{.PROJECT_DIR}}"
-        echo "PGEN {{.PROJECT_GENERATED_PKG}}"
+      - task: api-unaryops:gen-server
+  swagger-ui:
+    cmds:
       - task: swagger:gen-dist
+  gen-run-server:
+    cmds:
+      - task: api:gen-run-server
   build:
     cmds:
       - go build ./...
